@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.proyectosemestral
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -68,7 +68,7 @@ class SessionManager(context: Context) {
     private fun getFullHistory(): MutableMap<String, List<Purchase>> {
         val json = prefs.getString(KEY_PURCHASE_HISTORY, null)
         return if (json != null) {
-            val type = object : TypeToken<MutableMap<String, List<Purchase>>>() {}.type
+            val type = object : com.google.gson.reflect.TypeToken<MutableMap<String, List<Purchase>>>() {}.type
             gson.fromJson(json, type)
         } else {
             mutableMapOf()

@@ -1,4 +1,4 @@
-package com.example.myapplication.Data
+package com.example.proyectosemestral.ui.data
 
 data class Category(
     val title: String,

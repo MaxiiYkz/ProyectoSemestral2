@@ -7,14 +7,14 @@ plugins {
 android {
     namespace = "com.example.proyectosemestral"
     compileSdk {
-        version = release(36)
+        version = release(34)
     }
 
 
     defaultConfig {
         applicationId = "com.example.proyectosemestral"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -73,7 +73,6 @@ dependencies {
     implementation("io.coil-kt:coil:2.5.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")

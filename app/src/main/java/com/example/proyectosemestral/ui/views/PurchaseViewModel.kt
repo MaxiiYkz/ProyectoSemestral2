@@ -1,7 +1,8 @@
-package com.example.myapplication.views
-import androidx.lifecycle.ViewModel
+package com.example.proyectosemestral.ui.views
+
 import androidx.compose.runtime.mutableStateListOf
-import com.example.myapplication.Data.Purchase
+import androidx.lifecycle.ViewModel
+import com.example.proyectosemestral.ui.data.Purchase
 
 class PurchaseViewModel : ViewModel() {
 

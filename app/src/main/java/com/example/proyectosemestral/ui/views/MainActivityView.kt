@@ -1,6 +1,7 @@
-package com.example.netgames.views
+package com.example.proyectosemestral.ui.views
 
-import com.example.myapplication.Data.Category
+import androidx.compose.ui.platform.LocalContext
+import com.example.proyectosemestral.ui.data.Category
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,12 +20,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.Data.Review
-import com.example.myapplication.R
+import androidx.navigation.NavHostController
+import com.example.proyectosemestral.ui.data.Review
+import com.example.proyectosemestral.R
+import com.example.proyectosemestral.ui.data.AppState
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectosemestral.ui.data.DataStoreManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView() {
+fun MainView(navController: NavController, appState: AppState) {
     val categories = listOf(
         Category(
             "SHOOTERS",
@@ -171,5 +177,20 @@ fun ReviewCard(review: Review, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun MainViewPreview() {
-    MainView()
+    val fakeNavController = rememberNavController()
+
+    // 1. Obtenemos el Contexto del Preview
+    val context = LocalContext.current
+
+    // 2. Creamos un DataStoreManager (asumiendo que su constructor pide un Context)
+    val fakeDataStore = DataStoreManager(context)
+
+    // 3. Ahora creamos el AppState pasándole el dataStore
+    val fakeAppState = AppState(dataStore = fakeDataStore)
+
+    // 4. Y finalmente llamamos a MainView
+    MainView(
+        navController = fakeNavController,
+        appState = fakeAppState
+    )
 }
