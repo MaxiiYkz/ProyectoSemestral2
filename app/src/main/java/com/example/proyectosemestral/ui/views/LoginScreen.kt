@@ -139,7 +139,7 @@ fun LoginScreen(navController: NavHostController, appState: AppState){
                         error = "La Contraseña Debe Tener al Menos 5 Caracteres"
                     }else if(appState.login(usuario, contrasena)){
                         error = ""
-                        navController.navigate("MainActivityView")
+                        navController.navigate("home")
                     }else{
                         error = "Usuario y/o Contraseña Incorrectos"
                     }

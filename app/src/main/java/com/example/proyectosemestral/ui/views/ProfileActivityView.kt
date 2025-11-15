@@ -19,11 +19,52 @@ import com.example.proyectosemestral.ui.data.Purchase
 import com.example.proyectosemestral.ui.theme.NetGamesTheme
 import com.example.proyectosemestral.ui.views.PurchaseViewModel
 import com.example.proyectosemestral.R
+import androidx.navigation.NavController
+import com.example.proyectosemestral.ui.data.AppState
+import com.example.proyectosemestral.ui.navigation.AppScreen
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectosemestral.ui.data.DataStoreManager
+import com.example.proyectosemestral.ui.data.Usuario
+import androidx.annotation.RequiresApi
+import android.os.Build
 
-
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun PurchaseItem(purchase: Purchase) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = purchase.gameImageRes),
+                contentDescription = purchase.gameName,
+                modifier = Modifier.size(60.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = purchase.gameName, fontWeight = FontWeight.Bold)
+                Text(text = purchase.gamePrice, color = MaterialTheme.colorScheme.primary)
+            }
+            Text(text = purchase.formattedDate())
+        }
+    }
+}
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileView(username: String,purchaseViewModel: PurchaseViewModel = viewModel()) {
+fun ProfileView(appState: AppState, navController: NavController, purchaseViewModel: PurchaseViewModel = viewModel()) {
+
+    val username = appState.usuarioActual?.email ?: "Invitado"
+
     Scaffold(
         topBar = { TopAppBar(title = { Text("Mi Perfil") }) }
     ) { paddingValues ->
@@ -66,70 +107,55 @@ fun ProfileView(username: String,purchaseViewModel: PurchaseViewModel = viewMode
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* TODO: Implementar cerrar sesión */ }
+                onClick = {
+                    appState.logout()
+                    navController.navigate(AppScreen.Login.route) {
+                        popUpTo(0)
+                    }
+                }
             ) {
                 Text(
                     text = "Cerrar Sesión",
-                    fontSize = 18.sp  // 3. Y se aplica el 'fontSize' al Text.
+                    fontSize = 18.sp
                 )
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-                Text("Cerrar Sesión")
-
-
-            }
-
         }
     }
-@Composable
-fun PurchaseItem(purchase: Purchase) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = purchase.gameImageRes),
-                contentDescription = purchase.gameName,
-                modifier = Modifier.size(60.dp),
-                contentScale = ContentScale.Crop
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Preview(showBackground = true)
+    @Composable
+    fun ProfileViewPreview() {
+
+        NetGamesTheme {
+            // 1. Datos falsos para el Preview
+            val previewViewModel = PurchaseViewModel()
+            val fakeNavController = rememberNavController()
+            val context = LocalContext.current
+            val fakeDataStore = DataStoreManager(context)
+            val fakeAppState = AppState(fakeDataStore)
+
+            // 2. Simulamos un usuario logueado para el preview
+            fakeAppState.usuarioActual = Usuario(email = "usuario@preview.com", contrasena = "123")
+
+            // 3. Añadimos una compra de ejemplo
+            previewViewModel.addPurchase(
+                Purchase(
+                    gameName = "Juego Demo",
+                    gamePrice = "$10.000",
+                    gameImageRes = R.drawable.shooters
+                )
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = purchase.gameName, fontWeight = FontWeight.Bold)
-                Text(text = purchase.gamePrice, color = MaterialTheme.colorScheme.primary)
-            }
-            Text(text = purchase.formattedDate())
+
+            // 4. Llamamos a la función con los datos falsos
+            ProfileView(
+                appState = fakeAppState,
+                navController = fakeNavController,
+                purchaseViewModel = previewViewModel
+            )
         }
     }
 }
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileViewPreview() {
-
-    NetGamesTheme {
-        val previewViewModel = PurchaseViewModel()
-
-        previewViewModel.addPurchase(
-            Purchase(
-                gameName = "Juego Demo",
-                gamePrice = "$10.000",
-                gameImageRes = R.drawable.shooters
-                )
-            )
-
-            ProfileView(username = "UsuarioEjemplo", purchaseViewModel = previewViewModel)
-        }
-    }
 

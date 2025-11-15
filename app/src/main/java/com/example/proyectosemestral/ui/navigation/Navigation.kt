@@ -1,5 +1,7 @@
 package com.example.proyectosemestral.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
@@ -12,6 +14,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -57,8 +60,11 @@ fun AppNavigationBar(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(navController: NavHostController, appState: AppState){
+
+    val purchaseViewModel: PurchaseViewModel = viewModel()
 
     NavHost(
         navController = navController, startDestination = "login",
@@ -67,8 +73,8 @@ fun AppNavigation(navController: NavHostController, appState: AppState){
         composable(AppScreen.Register.route) { RegistroScreen(navController, appState) }
         composable(AppScreen.Recuperar.route) { RecuperarScreen(navController, appState) }
         composable(AppScreen.Home.route) { MainView(navController, appState) }
-        composable(AppScreen.Catalog.route) { CatalogView(navController= navController) }
-        composable(AppScreen.Profile.route) { ProfileView(username = "UsuarioEjemplo") }
+        composable(AppScreen.Catalog.route) { CatalogView(navController = navController, purchaseViewModel = purchaseViewModel) }
+        composable(AppScreen.Profile.route) { ProfileView(appState = appState, navController = navController, purchaseViewModel = purchaseViewModel) }
         composable(AppScreen.Login.route) { LoginScreen(navController, appState) }
         composable(AppScreen.Register.route) { RegistroScreen(navController, appState) }
     }

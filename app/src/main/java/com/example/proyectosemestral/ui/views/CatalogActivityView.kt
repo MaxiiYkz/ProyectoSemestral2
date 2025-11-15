@@ -22,14 +22,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectosemestral.ui.theme.NetGamesTheme
 import com.example.proyectosemestral.R
+import com.example.proyectosemestral.ui.views.PurchaseViewModel
+import com.example.proyectosemestral.ui.data.Purchase
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun CatalogView(navController: NavController) {
-
+fun CatalogView(navController: NavController, purchaseViewModel: PurchaseViewModel) {
 
 
     val games = listOf(
@@ -61,15 +62,17 @@ fun CatalogView(navController: NavController) {
                     .align(Alignment.CenterHorizontally)
             )
 
-            // 2. Cuadrícula para mostrar los juegos
+            // Cuadrícula para mostrar los juegos
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), // Dos columnas
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 items(games) { game ->
-                    GameCard(game = game, onBuyClicked = {navController.navigate("profile")})
-
-
+                    GameCard(game = game, onBuyClicked = {val newPurchase = Purchase(gameName = game.title, gamePrice = game.price, gameImageRes = game.imageUrl)
+                    purchaseViewModel.addPurchase(newPurchase)
+                        navController.navigate("profile")
+                    }
+                    )
                 }
             }
         }
@@ -114,8 +117,7 @@ fun GameCard(game: Game,onBuyClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = { onBuyClicked() }) {
 
-                Button(onClick = { /* Lógica de compra */ }) {
-
+                Button(onClick = { onBuyClicked }) {
                     Text("Comprar")
                 }
             }
@@ -131,7 +133,9 @@ fun CatalogViewPreview() {
 
     NetGamesTheme {
         val navController = rememberNavController()
-        CatalogView(navController = navController)
+        val fakeViewModel = PurchaseViewModel()
+
+        CatalogView(navController = navController, purchaseViewModel = fakeViewModel)
     }
 }
 
