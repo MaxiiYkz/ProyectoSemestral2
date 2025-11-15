@@ -9,7 +9,9 @@ data class Purchase(
     val gameName: String,
     val gamePrice: String,
     val gameImageRes: Int,
-    val date: LocalDateTime = LocalDateTime.now()
+    val date: LocalDateTime = LocalDateTime.now(),
+    val userEmail: String
+
 ) {
     @RequiresApi(value = Build.VERSION_CODES.O)
     fun formattedDate(): String {

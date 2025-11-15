@@ -86,43 +86,52 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
-            if (purchaseViewModel.purchases.isEmpty()) {
+            val currentUserEmail = appState.usuarioActual?.email
+
+            // Filtramos la lista global de compras
+            val userPurchases = if (currentUserEmail == null) {
+                // Si no hay nadie logueado, la lista está vacía
+                emptyList()
+            } else {
+                purchaseViewModel.purchases.filter { it.userEmail == currentUserEmail }
+            }
+
+            if (userPurchases.isEmpty()) {
                 Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "No tienes compras en tu historial.",
-                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             } else {
                 LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(purchaseViewModel.purchases) { purchase ->
+                    items(userPurchases) { purchase ->
                         PurchaseItem(purchase = purchase)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if(appState.usuarioActual != null ) {
 
-            Button(
-                onClick = {
-                    appState.logout()
-                    navController.navigate(AppScreen.Login.route) {
-                        popUpTo(0)
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                Button(
+                    onClick = {
+                        appState.logout()
+                        navController.navigate(AppScreen.Login.route) {
+                            popUpTo(0)
+                        }
                     }
+                ) {
+                    Text(
+                        text = "Cerrar Sesión",
+                        fontSize = 18.sp
+                    )
                 }
-            ) {
-                Text(
-                    text = "Cerrar Sesión",
-                    fontSize = 18.sp
-                )
             }
         }
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Preview(showBackground = true)
@@ -130,26 +139,12 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
     fun ProfileViewPreview() {
 
         NetGamesTheme {
-            // 1. Datos falsos para el Preview
             val previewViewModel = PurchaseViewModel()
             val fakeNavController = rememberNavController()
             val context = LocalContext.current
             val fakeDataStore = DataStoreManager(context)
             val fakeAppState = AppState(fakeDataStore)
 
-            // 2. Simulamos un usuario logueado para el preview
-            fakeAppState.usuarioActual = Usuario(email = "usuario@preview.com", contrasena = "123")
-
-            // 3. Añadimos una compra de ejemplo
-            previewViewModel.addPurchase(
-                Purchase(
-                    gameName = "Juego Demo",
-                    gamePrice = "$10.000",
-                    gameImageRes = R.drawable.shooters
-                )
-            )
-
-            // 4. Llamamos a la función con los datos falsos
             ProfileView(
                 appState = fakeAppState,
                 navController = fakeNavController,

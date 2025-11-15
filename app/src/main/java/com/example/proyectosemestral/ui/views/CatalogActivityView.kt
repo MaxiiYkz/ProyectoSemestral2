@@ -22,15 +22,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectosemestral.ui.theme.NetGamesTheme
 import com.example.proyectosemestral.R
-import com.example.proyectosemestral.ui.views.PurchaseViewModel
+import com.example.proyectosemestral.ui.data.AppState
 import com.example.proyectosemestral.ui.data.Purchase
+import com.example.proyectosemestral.ui.data.DataStoreManager
+import androidx.compose.ui.platform.LocalContext
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun CatalogView(navController: NavController, purchaseViewModel: PurchaseViewModel) {
+fun CatalogView(
+    navController: NavController,
+    purchaseViewModel: PurchaseViewModel,
+    appState: AppState
+) {
 
 
     val games = listOf(
@@ -68,9 +74,23 @@ fun CatalogView(navController: NavController, purchaseViewModel: PurchaseViewMod
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 items(games) { game ->
-                    GameCard(game = game, onBuyClicked = {val newPurchase = Purchase(gameName = game.title, gamePrice = game.price, gameImageRes = game.imageUrl)
-                    purchaseViewModel.addPurchase(newPurchase)
-                        navController.navigate("profile")
+                    GameCard(game = game, onBuyClicked = {
+
+                        val currentUserEmail = appState.usuarioActual?.email
+
+                        if(currentUserEmail != null) {
+
+                            val newPurchase = Purchase(
+                                gameName = game.title,
+                                gamePrice = game.price,
+                                gameImageRes = game.imageUrl,
+                                userEmail = currentUserEmail
+                            )
+                            purchaseViewModel.addPurchase(newPurchase)
+                            navController.navigate("profile")
+                        } else {
+                            navController.navigate("Login")
+                        }
                     }
                     )
                 }
@@ -117,7 +137,7 @@ fun GameCard(game: Game,onBuyClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = { onBuyClicked() }) {
 
-                Button(onClick = { onBuyClicked }) {
+                Button(onClick = { onBuyClicked() }) {
                     Text("Comprar")
                 }
             }
@@ -134,8 +154,11 @@ fun CatalogViewPreview() {
     NetGamesTheme {
         val navController = rememberNavController()
         val fakeViewModel = PurchaseViewModel()
+        val context = LocalContext.current
+        val fakeDataStore = DataStoreManager(context)
+        val fakeAppState = AppState(fakeDataStore)
 
-        CatalogView(navController = navController, purchaseViewModel = fakeViewModel)
+        CatalogView(navController = navController, purchaseViewModel = fakeViewModel, appState = fakeAppState)
     }
 }
 

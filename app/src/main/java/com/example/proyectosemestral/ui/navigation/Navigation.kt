@@ -73,7 +73,7 @@ fun AppNavigation(navController: NavHostController, appState: AppState){
         composable(AppScreen.Register.route) { RegistroScreen(navController, appState) }
         composable(AppScreen.Recuperar.route) { RecuperarScreen(navController, appState) }
         composable(AppScreen.Home.route) { MainView(navController, appState) }
-        composable(AppScreen.Catalog.route) { CatalogView(navController = navController, purchaseViewModel = purchaseViewModel) }
+        composable(AppScreen.Catalog.route) { CatalogView(navController = navController, purchaseViewModel = purchaseViewModel, appState = appState) }
         composable(AppScreen.Profile.route) { ProfileView(appState = appState, navController = navController, purchaseViewModel = purchaseViewModel) }
         composable(AppScreen.Login.route) { LoginScreen(navController, appState) }
         composable(AppScreen.Register.route) { RegistroScreen(navController, appState) }
