@@ -62,6 +62,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.core.content.ContextCompat
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Toast
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -121,9 +122,21 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
         }
     }
 
-
-
-
+val cameraPermissionLauncher = rememberLauncherForActivityResult(
+    contract = RequestPermission()
+) { isGranted: Boolean ->
+    if (isGranted) {
+        val newUri = createTempImageUri(context)
+        tempCameraUri = newUri
+        cameraLauncher.launch(newUri)
+    } else {
+        Toast.makeText(
+            context,
+            "Permiso de cámara denegado.",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+}
     val username = appState.usuarioActual?.email ?: "Invitado"
 
     if(showDialog){
@@ -135,9 +148,19 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
                 TextButton(
                     onClick = {
                         showDialog = false
-                        val newUri = createTempImageUri(context)
-                        tempCameraUri = newUri
-                        cameraLauncher.launch(newUri)
+                        when (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.CAMERA
+                        )) {
+                            PackageManager.PERMISSION_GRANTED -> {
+                                val newUri = createTempImageUri(context)
+                                tempCameraUri = newUri
+                                cameraLauncher.launch(newUri)
+                            }
+                            else -> {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
                     }
                 ) { Text("Cámara") }
             },
