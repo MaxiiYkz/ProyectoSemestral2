@@ -40,10 +40,10 @@ fun CatalogView(
 
 
     val games = listOf(
-        Game("Red Dead Redemption 2", "$9.990", R.drawable.rdr2),
-        Game("Cyberpunk 2077", "$29.990", R.drawable.cyberpunk),
-        Game("GTA V", "$19.990", R.drawable.gtav),
-        Game("Elden Ring", "$39.990", R.drawable.eldenring)
+        Game("Red Dead Redemption 2", 9990, R.drawable.rdr2),
+        Game("Cyberpunk 2077", 29990, R.drawable.cyberpunk),
+        Game("GTA V", 19990, R.drawable.gtav),
+        Game("Elden Ring", 39990, R.drawable.eldenring)
     )
 
     Box(
@@ -130,7 +130,7 @@ fun GameCard(game: Game,onBuyClicked: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
             Text(
-                text = game.price,
+                text = "$${game.price}",
                 color = CyanPriceText,
                 style = MaterialTheme.typography.bodyMedium
             )

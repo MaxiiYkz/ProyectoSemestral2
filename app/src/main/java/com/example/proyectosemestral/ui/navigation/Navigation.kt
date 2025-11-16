@@ -35,14 +35,22 @@ sealed class AppScreen(val route: String, val label: String, val icon: ImageVect
 }
 
 @Composable
-fun AppNavigationBar(navController: NavController) {
-    val items = listOf(
-        AppScreen.Home,
-        AppScreen.Catalog,
-        AppScreen.Profile,
-        AppScreen.Login,
-        AppScreen.Register
-    )
+fun AppNavigationBar(navController: NavController, appState: AppState) {
+    val items = if(appState.usuarioActual == null) {
+        listOf(
+            AppScreen.Home,
+            AppScreen.Catalog,
+            AppScreen.Profile,
+            AppScreen.Login,
+            AppScreen.Register
+        )
+    }else{
+        listOf(
+            AppScreen.Home,
+            AppScreen.Catalog,
+            AppScreen.Profile
+        )
+    }
 
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         items.forEach { screen ->

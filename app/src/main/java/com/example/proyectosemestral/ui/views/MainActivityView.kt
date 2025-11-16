@@ -27,6 +27,7 @@ import com.example.proyectosemestral.ui.data.AppState
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectosemestral.ui.data.DataStoreManager
+import com.example.proyectosemestral.ui.navigation.AppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +61,6 @@ fun MainView(navController: NavController, appState: AppState) {
         )
 
         Scaffold(
-
             topBar = {
                 TopAppBar(
                     title = { Text("NetGames") }
@@ -84,7 +84,7 @@ fun MainView(navController: NavController, appState: AppState) {
                     )
                 }
                 items(categories) { category ->
-                    CategoryCard(category = category)
+                    CategoryCard(category = category, navController = navController)
                 }
 
                 item {
@@ -104,7 +104,7 @@ fun MainView(navController: NavController, appState: AppState) {
 }
 
 @Composable
-fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
+fun CategoryCard(category: Category, navController: NavController, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -140,7 +140,7 @@ fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = {  },
+                onClick = { navController.navigate("catalog") },
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFE6007A)
@@ -179,16 +179,12 @@ fun ReviewCard(review: Review, modifier: Modifier = Modifier) {
 fun MainViewPreview() {
     val fakeNavController = rememberNavController()
 
-    // 1. Obtenemos el Contexto del Preview
     val context = LocalContext.current
 
-    // 2. Creamos un DataStoreManager (asumiendo que su constructor pide un Context)
     val fakeDataStore = DataStoreManager(context)
 
-    // 3. Ahora creamos el AppState pasándole el dataStore
     val fakeAppState = AppState(dataStore = fakeDataStore)
 
-    // 4. Y finalmente llamamos a MainView
     MainView(
         navController = fakeNavController,
         appState = fakeAppState

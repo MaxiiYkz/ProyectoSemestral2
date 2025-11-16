@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 data class Purchase(
     val gameName: String,
-    val gamePrice: String,
+    val gamePrice: Int,
     val gameImageRes: Int,
     val date: LocalDateTime = LocalDateTime.now(),
     val userEmail: String

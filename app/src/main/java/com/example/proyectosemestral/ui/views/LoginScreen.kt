@@ -161,7 +161,7 @@ fun LoginScreen(navController: NavHostController, appState: AppState){
                     Text("¿Olvidaste tu contraseña?")
                 }
 
-                TextButton(onClick =  { navController.navigate("registro")}) {
+                TextButton(onClick =  { navController.navigate("Register")}) {
                     Text("¿No tienes cuenta? Regístrate Aquí")
                 }
             }

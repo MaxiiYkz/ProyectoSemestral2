@@ -42,21 +42,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             NetGamesTheme {
 
-                // 3. Crea el NavController y el AppState y "recuérdalos"
                 val navController = rememberNavController()
                 val appState = remember { AppState(dataStore) }
 
-                // 4. Carga los datos
-                appState.cargarDatos() // (Idealmente esto iría en un ViewModel, pero así funciona)
+                appState.cargarDatos()
 
-                // 5. Construye la UI completa
                 Scaffold(
                     bottomBar = {
-                        // Le pasas el ÚNICO NavController
-                        AppNavigationBar(navController = navController)
+                        AppNavigationBar(navController = navController, appState = appState)
                     }
                 ) { innerPadding ->
-                    // Le pasas ESE MISMO NavController al NavHost (AppNavigation)
                     Box(modifier = Modifier.padding(innerPadding)) {
                         AppNavigation(
                             navController = navController,

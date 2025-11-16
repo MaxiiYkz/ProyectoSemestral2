@@ -8,13 +8,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 
 data class Usuario(val email: String, val contrasena: String)
 
 class AppState(private val dataStore: DataStoreManager){
     val usuarios = mutableStateListOf<Usuario>()
-    var usuarioActual: Usuario? = null
+    var usuarioActual by mutableStateOf<Usuario?>(null)
+        private set
     
     private val scope = CoroutineScope(Dispatchers.IO)
 

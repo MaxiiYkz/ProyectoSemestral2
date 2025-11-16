@@ -12,7 +12,7 @@ class PurchaseViewModel : ViewModel() {
         purchases.add(purchase)
     }
 
-    fun clearPurchases() {
-        purchases.clear()
+    fun removePurchase(purchase: Purchase){
+        purchases.remove(purchase)
     }
 }

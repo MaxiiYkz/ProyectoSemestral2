@@ -28,10 +28,38 @@ import com.example.proyectosemestral.ui.data.DataStoreManager
 import com.example.proyectosemestral.ui.data.Usuario
 import androidx.annotation.RequiresApi
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.ui.draw.clip
+import coil.compose.AsyncImage // <-- ¡El import de Coil!
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.remember
+import java.io.File
+import androidx.core.content.FileProvider
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture // <-- Importante
+import androidx.compose.ui.platform.LocalContext
+import java.util.Objects
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PurchaseItem(purchase: Purchase) {
+fun PurchaseItem(purchase: Purchase, onDelete: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,7 +68,7 @@ fun PurchaseItem(purchase: Purchase) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -50,11 +78,21 @@ fun PurchaseItem(purchase: Purchase) {
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = purchase.gameName, fontWeight = FontWeight.Bold)
-                Text(text = purchase.gamePrice, color = MaterialTheme.colorScheme.primary)
+
+            Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                Text(text = purchase.gameName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(text = "$${purchase.gamePrice}", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodyMedium,maxLines = 1)
             }
-            Text(text = purchase.formattedDate())
+            Text(text = purchase.formattedDate(), fontSize = 12.sp, color = Color.Gray, maxLines = 1)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Close, contentDescription = "Eliminar")
+            }
         }
     }
 }
@@ -62,6 +100,14 @@ fun PurchaseItem(purchase: Purchase) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(appState: AppState, navController: NavController, purchaseViewModel: PurchaseViewModel = viewModel()) {
+
+    var imageUri by rememberSaveable{ mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+
+    val galleryLauncher= rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? -> imageUri = uri }
+
 
     val username = appState.usuarioActual?.email ?: "Invitado"
 
@@ -75,6 +121,18 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            AsyncImage(
+                model = imageUri,
+                contentDescription = "Foto de Perfil",
+                modifier = Modifier.size(100.dp).clip(CircleShape).clickable {galleryLauncher.launch("image/*")},
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_profile_placeholder),
+                error = painterResource(id= R.drawable.ic_profile_placeholder)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Bienvenido, $username",
                 fontSize = 22.sp
@@ -106,15 +164,23 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
             } else {
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(userPurchases) { purchase ->
-                        PurchaseItem(purchase = purchase)
+                        PurchaseItem(purchase = purchase, onDelete = { purchaseViewModel.removePurchase(purchase) })
                     }
                 }
             }
 
+            val total = userPurchases.sumOf { it.gamePrice }
+
+            Text(
+                text = "Total de Compra: $${total}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             if(appState.usuarioActual != null ) {
 
                 Spacer(modifier = Modifier.height(16.dp))
-
 
                 Button(
                     onClick = {
