@@ -26,8 +26,8 @@ import com.example.proyectosemestral.ui.data.AppState
 import com.example.proyectosemestral.ui.data.Purchase
 import com.example.proyectosemestral.ui.data.DataStoreManager
 import androidx.compose.ui.platform.LocalContext
-
-
+import com.example.proyectosemestral.ui.navigation.AppScreen
+import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,7 +38,7 @@ fun CatalogView(
     appState: AppState
 ) {
 
-
+    val context = LocalContext.current
     val games = listOf(
         Game("Red Dead Redemption 2", 9990, R.drawable.rdr2),
         Game("Cyberpunk 2077", 29990, R.drawable.cyberpunk),
@@ -89,6 +89,11 @@ fun CatalogView(
                             purchaseViewModel.addPurchase(newPurchase)
                             navController.navigate("profile")
                         } else {
+                            Toast.makeText(
+                                context,
+                                "Debes Iniciar Sesión Para Comprar",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             navController.navigate("Login")
                         }
                     }

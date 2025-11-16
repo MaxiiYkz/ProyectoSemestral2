@@ -189,7 +189,9 @@ val cameraPermissionLauncher = rememberLauncherForActivityResult(
             AsyncImage(
                 model = imageUri,
                 contentDescription = "Foto de Perfil",
-                modifier = Modifier.size(100.dp).clip(CircleShape).clickable {showDialog = true},
+                modifier = Modifier.size(100.dp).clip(CircleShape).clickable (enabled = appState.usuarioActual != null) {
+                    showDialog = true
+                },
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_profile_placeholder),
                 error = painterResource(id= R.drawable.ic_profile_placeholder)
