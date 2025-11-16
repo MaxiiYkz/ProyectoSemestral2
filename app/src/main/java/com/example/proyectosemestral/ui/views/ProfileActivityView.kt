@@ -1,5 +1,6 @@
 package com.example.proyectosemestral.ui.views
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,6 +57,11 @@ import androidx.core.content.FileProvider
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture // <-- Importante
 import androidx.compose.ui.platform.LocalContext
 import java.util.Objects
+import kotlin.io.path.createTempDirectory
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission // <-- ¡Importante!
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -103,13 +109,48 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
 
     var imageUri by rememberSaveable{ mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
-
+    var showDialog by remember { mutableStateOf(false) }
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     val galleryLauncher= rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? -> imageUri = uri }
 
+    val cameraLauncher = rememberLauncherForActivityResult(contract = TakePicture()){
+        success: Boolean -> if(success){
+            imageUri = tempCameraUri
+        }
+    }
+
+
+
 
     val username = appState.usuarioActual?.email ?: "Invitado"
+
+    if(showDialog){
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Cambiar Foto de Perfil") },
+            text = { Text("¿Desde Donde Quieres Subir la Foto?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        val newUri = createTempImageUri(context)
+                        tempCameraUri = newUri
+                        cameraLauncher.launch(newUri)
+                    }
+                ) { Text("Cámara") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        galleryLauncher.launch("image/*")
+                    }
+                ) { Text("Galería") }
+            }
+        )
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Mi Perfil") }) }
@@ -125,7 +166,7 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
             AsyncImage(
                 model = imageUri,
                 contentDescription = "Foto de Perfil",
-                modifier = Modifier.size(100.dp).clip(CircleShape).clickable {galleryLauncher.launch("image/*")},
+                modifier = Modifier.size(100.dp).clip(CircleShape).clickable {showDialog = true},
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_profile_placeholder),
                 error = painterResource(id= R.drawable.ic_profile_placeholder)
@@ -218,5 +259,21 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
             )
         }
     }
+}
+
+private fun createTempImageUri(context: Context): Uri {
+    val directory = File(context.cacheDir, "images")
+    directory.mkdirs()
+    val file = File.createTempFile(
+        "temp_image_",
+        ".jpg",
+        directory
+    )
+    val authority = "com.example.proyectosemestral.provider"
+    return FileProvider.getUriForFile(
+        Objects.requireNonNull(context),
+        authority,
+        file
+    )
 }
 
