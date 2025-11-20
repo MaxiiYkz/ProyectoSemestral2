@@ -54,11 +54,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.remember
 import java.io.File
 import androidx.core.content.FileProvider
-import androidx.activity.result.contract.ActivityResultContracts.TakePicture // <-- Importante
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.compose.ui.platform.LocalContext
 import java.util.Objects
 import kotlin.io.path.createTempDirectory
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission // <-- ¡Importante!
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
 import android.Manifest
 import android.content.pm.PackageManager
@@ -108,17 +108,21 @@ fun PurchaseItem(purchase: Purchase, onDelete: () -> Unit) {
 @Composable
 fun ProfileView(appState: AppState, navController: NavController, purchaseViewModel: PurchaseViewModel = viewModel()) {
 
-    var imageUri by rememberSaveable{ mutableStateOf<Uri?>(null) }
+    var imageUri = appState.profileImageUri
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     val galleryLauncher= rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> imageUri = uri }
+    ) { uri: Uri? ->
+        if (uri != null) {
+            appState.updateProfileImage(uri)
+        }
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(contract = TakePicture()){
-        success: Boolean -> if(success){
-            imageUri = tempCameraUri
+        success: Boolean -> if(success) {
+            appState.updateProfileImage(tempCameraUri)
         }
     }
 
