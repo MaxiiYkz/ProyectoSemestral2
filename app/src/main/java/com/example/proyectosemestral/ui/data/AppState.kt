@@ -45,7 +45,7 @@ class AppState(private val dataStore: DataStoreManager) {
     }
 
     fun login(email: String, contrasena: String): Boolean {
-        var user = usuarios.find { it.email == email && it.contrasena == contrasena }
+        val user = usuarios.find { it.email == email && it.contrasena == contrasena }
         return if (user != null) {
             usuarioActual = user
 

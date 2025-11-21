@@ -44,7 +44,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.draw.clip
-import coil.compose.AsyncImage // <-- ¡El import de Coil!
+import coil.compose.AsyncImage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +55,6 @@ import androidx.compose.runtime.remember
 import java.io.File
 import androidx.core.content.FileProvider
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
-import androidx.compose.ui.platform.LocalContext
 import java.util.Objects
 import kotlin.io.path.createTempDirectory
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -63,6 +62,11 @@ import androidx.core.content.ContextCompat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.compose.runtime.key
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
+import coil.request.CachePolicy
+import java.io.FileOutputStream
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -75,7 +79,9 @@ fun PurchaseItem(purchase: Purchase, onDelete: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -86,7 +92,9 @@ fun PurchaseItem(purchase: Purchase, onDelete: () -> Unit) {
             )
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+            Column(modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()) {
                 Text(text = purchase.gameName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -108,21 +116,32 @@ fun PurchaseItem(purchase: Purchase, onDelete: () -> Unit) {
 @Composable
 fun ProfileView(appState: AppState, navController: NavController, purchaseViewModel: PurchaseViewModel = viewModel()) {
 
-    var imageUri = appState.profileImageUri
+    val imageUri = appState.profileImageUri
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
-    val galleryLauncher= rememberLauncherForActivityResult(
+    val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            appState.updateProfileImage(uri)
+    ) { uriOriginal: Uri? ->
+        if (uriOriginal != null) {
+            // CLONAMOS la imagen para evitar problemas de permisos
+            val uriClonada = copiarImagenAlCache(context, uriOriginal)
+            if (uriClonada != null) {
+                // Guardamos la CLONADA, no la original
+                appState.updateProfileImage(uriClonada)
+            }
         }
     }
 
-    val cameraLauncher = rememberLauncherForActivityResult(contract = TakePicture()){
-        success: Boolean -> if(success) {
-            appState.updateProfileImage(tempCameraUri)
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = TakePicture()
+    ) { success: Boolean ->
+        if (success && tempCameraUri != null) {
+            // CLONAMOS también la de la cámara para asegurar
+            val uriClonada = copiarImagenAlCache(context, tempCameraUri!!)
+            if (uriClonada != null) {
+                appState.updateProfileImage(uriClonada)
+            }
         }
     }
 
@@ -189,17 +208,27 @@ val cameraPermissionLauncher = rememberLauncherForActivityResult(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            AsyncImage(
-                model = imageUri,
-                contentDescription = "Foto de Perfil",
-                modifier = Modifier.size(100.dp).clip(CircleShape).clickable (enabled = appState.usuarioActual != null) {
-                    showDialog = true
-                },
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.ic_profile_placeholder),
-                error = painterResource(id= R.drawable.ic_profile_placeholder)
-            )
+            key(imageUri) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(File(imageUri?.path ?: ""))
+                        .setParameter("timestamp", System.currentTimeMillis().toString())
+                        .diskCachePolicy(CachePolicy.DISABLED)
+                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Foto de perfil",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .clickable(enabled = appState.usuarioActual != null) {
+                            showDialog = true
+                        },
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.ic_profile_placeholder),
+                    error = painterResource(id = R.drawable.ic_profile_placeholder)
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -305,4 +334,21 @@ private fun createTempImageUri(context: Context): Uri {
         file
     )
 }
+
+fun copiarImagenAlCache(context: Context, uri: Uri): Uri? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+
+        val file = File(context.cacheDir, "foto_perfil_actual.jpg")
+        val outputStream = FileOutputStream(file)
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
+        Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
 
