@@ -49,6 +49,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:${nav_version}")
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation("androidx.compose.material3:material3")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
