@@ -9,7 +9,7 @@ USE proyecto_semestral_db;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) UNIQUE,
-    password VARCHAR(255) -- En producción, esto debería estar encriptado
+    password VARCHAR(255)
 );
 
 3. Luego abrir el backend, y ejecutarlo.
