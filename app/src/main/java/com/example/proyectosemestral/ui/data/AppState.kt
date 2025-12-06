@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 
 class AppState(private val dataStore: DataStoreManager) {
 
-    // Variable simple para el nombre/email
+    // Variable simple para el usuario (String)
     var usuarioActual by mutableStateOf("Invitado")
         private set
 
@@ -21,20 +21,17 @@ class AppState(private val dataStore: DataStoreManager) {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    // Función para guardar sesión
     fun guardarUsuario(email: String, id: Int?) {
         usuarioActual = email
         userId = id
     }
 
-    // Función Logout
     fun logout() {
         usuarioActual = "Invitado"
         userId = null
         profileImageUri = null
     }
 
-    // Función Foto
     fun updateProfileImage(uri: Uri?) {
         profileImageUri = uri
     }

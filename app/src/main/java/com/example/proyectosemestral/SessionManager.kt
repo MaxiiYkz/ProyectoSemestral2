@@ -3,7 +3,6 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-// Data class para modelar una compra
 data class Purchase(val producto: String, val precio: Int, val fecha: String)
 
 class SessionManager(context: Context) {
@@ -16,7 +15,6 @@ class SessionManager(context: Context) {
         private const val KEY_PURCHASE_HISTORY = "historialCompras"
     }
 
-    // Iniciar sesión
     fun login(username: String) {
         prefs.edit().apply {
             putBoolean(KEY_SESSION_ACTIVE, true)
@@ -25,7 +23,6 @@ class SessionManager(context: Context) {
         }
     }
 
-    // Cerrar sesión
     fun logout() {
         prefs.edit().apply {
             remove(KEY_SESSION_ACTIVE)
@@ -34,17 +31,14 @@ class SessionManager(context: Context) {
         }
     }
 
-    // Verificar si la sesión está activa
     fun isSessionActive(): Boolean {
         return prefs.getBoolean(KEY_SESSION_ACTIVE, false)
     }
 
-    // Obtener el nombre del usuario activo
     fun getActiveUser(): String? {
         return prefs.getString(KEY_ACTIVE_USER, null)
     }
 
-    // Añadir una compra al historial del usuario activo
     fun addPurchase(productName: String, price: Int) {
         val user = getActiveUser() ?: return
         val allHistory = getFullHistory()
@@ -57,14 +51,13 @@ class SessionManager(context: Context) {
         saveFullHistory(allHistory)
     }
 
-    // Obtener las compras del usuario activo
+
     fun getUserPurchases(): List<Purchase> {
         val user = getActiveUser() ?: return emptyList()
         val allHistory = getFullHistory()
         return allHistory[user] ?: emptyList()
     }
 
-    // Métodos privados para manejar el historial completo en JSON
     private fun getFullHistory(): MutableMap<String, List<Purchase>> {
         val json = prefs.getString(KEY_PURCHASE_HISTORY, null)
         return if (json != null) {
