@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 
 class AppState(private val dataStore: DataStoreManager) {
 
-    // Variable simple para el usuario (String)
+
     var usuarioActual by mutableStateOf("Invitado")
         private set
 

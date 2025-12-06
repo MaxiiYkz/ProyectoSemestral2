@@ -18,7 +18,6 @@ object RetrofitInstance {
             .create(ApiService::class.java)
     }
 
-    // INSTANCIA 2: Para el registro y login (NUEVA)
     val apiAuth: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL_AUTH)

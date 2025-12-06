@@ -155,8 +155,6 @@ fun RegistroScreen(navController: NavHostController, appState: AppState){
                             error = "La contraseña debe tener al menos 6 caracteres"
                         contrasena != confirmarContrasena ->
                             error = "La contraseña no coincide"
-                        /*!appState.registrarUsuario(email, contrasena) ->
-                            error = "El Usuario ya Existe"*/
                         else -> {
                             error = ""
                             isLoading = true

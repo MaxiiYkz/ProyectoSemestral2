@@ -99,9 +99,8 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
     var showDialog by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // 1. CAMBIO: Definimos si está logueado basándonos en si el nombre NO es "Invitado"
+
     val isLoggedIn = appState.usuarioActual != "Invitado"
-    // 2. CAMBIO: El username es directamente la variable del AppState
     val username = appState.usuarioActual
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -246,7 +245,6 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // 5. CAMBIO: Botón Logout visible solo si está logueado
             if(isLoggedIn) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
@@ -264,8 +262,7 @@ fun ProfileView(appState: AppState, navController: NavController, purchaseViewMo
     }
 }
 
-// ... Las funciones auxiliares (createTempImageUri, copiarImagenAlCache) quedan IGUAL ...
-// Solo asegúrate de copiarlas si no están en otro archivo.
+
 private fun createTempImageUri(context: Context): Uri {
     val directory = File(context.cacheDir, "images")
     directory.mkdirs()
