@@ -1,5 +1,7 @@
-1. Para crear la base de datos, primero, tener instalado MySQL Workbench.
-2. Luego de estar dentro de SQL, cargar este codigo:
+1. Descargar el Backend, cargarlo en VSCODE.
+2. Ejecutar el server.js (En caso de tener otra contraseña del root, cambiarla en password: 'tu_contraseña').
+4. Para crear la base de datos, primero, tener instalado MySQL Workbench.
+5. Luego de estar dentro de SQL, cargar este codigo:
    
 drop table users;
 
@@ -12,6 +14,6 @@ CREATE TABLE users (
     password VARCHAR(255)
 );
 
-3. Luego abrir el backend, y ejecutarlo.
+5. Luego abrir el backend, y ejecutarlo.
 
 Con eso tendriamos listo, y podemos guardar los usuarios.
